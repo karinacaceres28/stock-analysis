@@ -166,3 +166,154 @@ When I run the code, the message below shows the runtime
 
 ### Refactored Code
 Like the original set, I formatted the output sheet on the “All Stocks Analysis” worksheet and initialized an array of all tickers, activated the data worksheet to the active year, and got the number of rows to loop over. I start to diverge from the original code by creating my ticker index and setting it to 0. I also created three output arrays for ticker volumes, starting, and ending price. I set the ticker volume as a long while the starting and ending price as doubles. Continuing, created a for loop to initialize the ticker volume to zero, looped over all the rows in the spreadsheet, increased the volume for current ticker, and checked if the current row was the first row with the selected ticker index. I also checked if the current is the last row with the selected ticker, and if the next row’s ticker did not match, I increased the ticker index. I then looped through my arrays to output the ticker, total daily volume, and return. Finally ending the code by formatting the cells and adding a button to put the selected year.
+
+`Sub AllStocksAnalysisRefactored()
+    Dim startTime As Single
+    Dim endTime  As Single
+    
+    
+    yearValue = InputBox("What year would you like to run the analysis on?")
+
+    startTime = Timer
+    
+    'Format the output sheet on All Stocks Analysis worksheet
+    Worksheets("All Stocks Analysis").Activate
+    
+    Range("A1").Value = "All Stocks (" + yearValue + ")"
+    
+    'Create a header row
+    Cells(3, 1).Value = "Ticker"
+    Cells(3, 2).Value = "Total Daily Volume"
+    Cells(3, 3).Value = "Return"
+
+    'Initialize array of all tickers
+    Dim tickers(12) As String
+    
+    tickers(0) = "AY"
+    tickers(1) = "CSIQ"
+    tickers(2) = "DQ"
+    tickers(3) = "ENPH"
+    tickers(4) = "FSLR"
+    tickers(5) = "HASI"
+    tickers(6) = "JKS"
+    tickers(7) = "RUN"
+    tickers(8) = "SEDG"
+    tickers(9) = "SPWR"
+    tickers(10) = "TERP"
+    tickers(11) = "VSLR"
+    
+    'Activate data worksheet
+    Worksheets(yearValue).Activate
+    
+    'Get the number of rows to loop over
+    RowCount = Cells(Rows.Count, "A").End(xlUp).Row
+    
+    '1a) Create a ticker Index
+     Dim tickerIndex As Integer
+     tickerIndex = 0
+
+    '1b) Create three output arrays
+    Dim tickerVolumes(12) As Long
+    Dim tickerStartingPrices(12) As Single
+    Dim tickerEndingPrices(12) As Single
+
+    
+    '2a) Create a for loop to initialize the tickerVolumes to zero.
+    For i = 0 To 11
+        tickerVolumes(i) = 0
+        
+        Next i
+        
+        
+    '2b) Loop over all the rows in the spreadsheet.
+    For i = 2 To RowCount
+    
+        '3a) Increase volume for current ticker
+        tickerVolumes(tickerIndex) = tickerVolumes(tickerIndex) + Cells(i, 8).Value
+        
+  
+        
+        '3b) Check if the current row is the first row with the selected tickerIndex.
+        'If  Then
+          If Cells(i - 1, 1).Value <> tickers(tickerIndex) Then
+            tickerStartingPrices(tickerIndex) = Cells(i, 6).Value
+        End If
+            
+        'End If
+        
+        '3c) check if the current row is the last row with the selected ticker
+         'If the next row’s ticker doesn’t match, increase the tickerIndex.
+        'If  Then
+            If Cells(i + 1, 1) <> tickers(tickerIndex) Then
+                tickerEndingPrices(tickerIndex) = Cells(i, 6).Value
+           
+            
+
+            '3d Increase the tickerIndex.
+            tickerIndex = tickerIndex + 1
+            
+        End If
+        'End If
+    
+Next i
+
+    
+    '4) Loop through your arrays to output the Ticker, Total Daily Volume, and Return.
+    For i = 0 To 11
+        
+        Worksheets("All Stocks Analysis").Activate
+        
+        Cells(i + 4, 1).Value = tickers(i)
+        Cells(i + 4, 2).Value = tickerVolumes(i)
+        Cells(i + 4, 3).Value = tickerEndingPrices(i) / tickerStartingPrices(i) - 1
+
+        
+        
+    Next i
+    
+    'Formatting
+    Worksheets("All Stocks Analysis").Activate
+    Range("A3:C3").Font.FontStyle = "Bold"
+    Range("A3:C3").Borders(xlEdgeBottom).LineStyle = xlContinuous
+    Range("B4:B15").NumberFormat = "#,##0"
+    Range("C4:C15").NumberFormat = "0.0%"
+    Columns("B").AutoFit
+
+    dataRowStart = 4
+    dataRowEnd = 15
+
+    For i = dataRowStart To dataRowEnd
+        
+        If Cells(i, 3) > 0 Then
+            
+            Cells(i, 3).Interior.Color = vbGreen
+            
+        Else
+        
+            Cells(i, 3).Interior.Color = vbRed
+            
+        End If
+        
+    Next i
+ 
+    endTime = Timer
+MsgBox "This code ran in " & (endTime - startTime) & " seconds for the year " & (yearValue)
+
+End Sub'
+
+
+
+When I run the code, the message below shows the runtime
+
+<img width="261" alt="VBA_Challenge_2018" src="https://user-images.githubusercontent.com/110318652/191646623-e34a664d-f3b5-4d3b-a567-aadbe07ba547.png">
+
+### Original Code Vs Refactored Code
+The refactored code is more efficient compared to the original code. The original code has a nested loop, while in the refactored one the code stays in the same loop. Rather than create a nested loop it simply added a separate for loop the results are then obtained in the selected year. The code in the refactored loop is also a lot faster than the original code.
+
+## Summary
+
+### Advantages and Disadvantages of Refactoring Code in General
+An advantage of using refactoring code in general is that it is more efficient and allows for data to be pulled on a larger data set. A disadvantage of refactoring code is I see the potential of it being time consuming, this could be due to trying to figure out the purpose of the code and its functionality.
+
+### Refactoring the original VBA script
+As shown above, refactoring the original code allowed the code to run a lot faster than it did for the original code. However, the disadvantage was that it was a lot more time consuming due to me trying to figure out the purpose and functionality of the code. The original code was a lot easier for me to complete in the module because it was easier to follow the logic of the code. However, the disadvantage of the original code was it only allows data to be pulled from a smaller set.
